@@ -1,0 +1,44 @@
+function Get-NestedValue {
+    param (
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Object,
+
+        [Parameter(Mandatory = $true)]
+        [ValidateNotNullOrEmpty()]
+        $Key
+    )
+
+    $keys = $Key -split '/'
+    foreach ($k in $keys) {
+        if ($Object -is [System.Collections.IDictionary] -and $Object.ContainsKey($k)) {
+            $Object = $Object[$k]
+        } else {
+            return $null
+        }
+    }
+    return $Object
+}
+
+# Example usage
+$object = @{
+    "a" = @{
+        "b" = @{
+            "c" = "d"
+        }
+    }
+}
+$key = "a/b/c"
+$result = Get-NestedValue -Object $object -Key $key
+Write-Output $result  # Output: "d"
+
+$object = @{
+    "x" = @{
+        "y" = @{
+            "z" = "a"
+        }
+    }
+}
+$key = "x/y/z"
+$result = Get-NestedValue -Object $object -Key $key
+Write-Output $result  # Output: "a"
